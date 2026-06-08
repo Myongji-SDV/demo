@@ -194,6 +194,13 @@ export function getExternalSnapshot() {
   return result;
 }
 
+export function broadcastVehicleFleet(fleet) {
+  const payload = JSON.stringify({ type: 'fleet', data: fleet });
+  for (const v of vehicles.values()) {
+    if (v.ws && v.ws.readyState === WebSocket.OPEN) v.ws.send(payload);
+  }
+}
+
 /* ── 아웃바운드 연결 (DisplayFeature_v2 WS → 브릿지 클라이언트) ───── */
 // platforms.json 에 등록된 플랫폼의 DisplayFeature WS 에 브릿지가 직접 연결.
 // vehicle_state 메시지에 x,y,angle 이 포함된 경우 위치도 함께 갱신.

@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
-import { startBridge, connectPlatforms, getExternalSnapshot } from './platform-bridge.js';
+import { startBridge, connectPlatforms, getExternalSnapshot, broadcastVehicleFleet } from './platform-bridge.js';
 import { nearestEdge } from './road-utils.js';
 
 /**
@@ -86,11 +86,12 @@ function addRoadInfo(v) {
 function sendFleetState() {
   const external = getExternalSnapshot();
   for (const v of external) addRoadInfo(v);
-  broadcastDisplay({ type: 'fleet', data: external });
+  const fleet = { type: 'fleet', data: external };
+  broadcastDisplay(fleet);
+  broadcastVehicleFleet(external);
 }
 
 setInterval(() => {
-  if (displayClients.size === 0) return;
   sendFleetState();
 }, BROADCAST_INTERVAL_MS);
 
