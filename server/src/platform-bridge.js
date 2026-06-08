@@ -114,6 +114,18 @@ export function startBridge(onVehicleUpdate) {
             vehicle.accel = d.accel ?? 0;
             vehicle.brake = d.brake ?? 0;
             vehicle.steer = d.steer ?? 0;
+            if (d.x != null && isValidPosition(d.x, d.y ?? vehicle.y, vehicle.x, vehicle.y)) {
+              const prevX = vehicle.x, prevY = vehicle.y;
+              vehicle.x = d.x;
+              vehicle.y = d.y ?? vehicle.y;
+              vehicle.hasPosition = true;
+              if (d.angle != null) {
+                vehicle.angle = d.angle;
+              } else {
+                const dx = vehicle.x - prevX, dy = vehicle.y - prevY;
+                if (dx * dx + dy * dy > 0.01) vehicle.angle = Math.atan2(dy, dx);
+              }
+            }
           }
         } else if (msg.type === 'location' && msg.data) {
           const d = parseData(msg.data);
